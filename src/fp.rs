@@ -32,6 +32,18 @@ pub fn fp_mul3(x: &mut params::Fp, y: &params::Fp, z: &params::Fp) {
     }
 }
 
+pub fn fp_mul2(x: &mut params::Fp, y: &params::Fp) {
+    let mut tmp = params::Fp { c: [0; params::LIMBS] };
+    for i in 0..params::LIMBS {
+        tmp.c[i] = x.c[i];
+    }
+    fp_mul3(x, &tmp, y);
+}
+
+pub fn fp_sq2(x: &mut params::Fp, y: &params::Fp) {
+    fp_mul3(x, y, y);
+}
+
 pub fn fp_enc(x: &mut params::Fp, y: &params::UInt) {
     let mut y_fp = params::Fp { c: [0; params::LIMBS] };
     for i in 0..params::LIMBS {
@@ -40,6 +52,18 @@ pub fn fp_enc(x: &mut params::Fp, y: &params::UInt) {
     fp_mul3(x, &y_fp, &constants::R_SQUARED_MOD_P);
 }
 
+pub fn fp_dec(x: &mut params::UInt, y: &params::Fp) {
+   let mut x_fp = params::Fp { c: [0; params::LIMBS] };
+    for i in 0..params::LIMBS {
+        x_fp.c[i] = x.c[i];
+    }
+    // convert uint::IINT_1 to fp_uint
+    let mut fp_uint_1 = params::Fp { c: [0; params::LIMBS] };
+    for i in 0..params::LIMBS {
+        fp_uint_1.c[i] = uint::UINT_1.c[i];
+    }
+    fp_mul3(&mut x_fp, y, &fp_uint_1);
+}
 
 
 pub fn reduce_once(x: &mut params::UInt) {
