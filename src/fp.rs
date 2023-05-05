@@ -44,6 +44,55 @@ pub fn fp_sq2(x: &mut params::Fp, y: &params::Fp) {
     fp_mul3(x, y, y);
 }
 
+pub fn fp_sq1(x: &mut params::Fp) {
+    let mut tmp = params::Fp { c: [0; params::LIMBS] };
+    for i in 0..params::LIMBS {
+        tmp.c[i] = x.c[i];
+    }
+    fp_sq2(x, &tmp);
+}
+
+pub fn fp_pow(x: &mut params::Fp, e: &params::UInt) {
+    let mut y = *x;
+    *x = constants::FP_1;
+    for i in 0..params::LIMBS {
+        let mut t = e.c[i];
+        for i in 0..64 {
+            if t & 1 == 1 {
+                fp_mul2(x, &y);
+            }
+            fp_sq1(&mut y);
+            t >>= 1;
+        }
+    }
+}
+
+pub fn fp_inv(x: &mut params::Fp) {
+    let mut tmp = params::Fp { c: [0; params::LIMBS] };
+    for i in 0..params::LIMBS {
+        tmp.c[i] = x.c[i];
+    }
+
+    fp_pow(&mut tmp, &constants::P_MINUS_2);
+}
+
+pub fn fp_issquare(x: &params::Fp) -> bool {
+    let mut y = *x;
+    fp_pow(&mut y, &constants::P_MINUS_1_HALVES);
+    // return !memcmp(x, &fp_1, sizeof(fp));
+    for i in 0..params::LIMBS {
+        if x.c[i] != constants::FP_1.c[i] {
+            return false;
+        }
+    }
+    true
+}
+
+
+pub fn fp_random(x: &params::Fp) {
+    
+}
+
 pub fn fp_enc(x: &mut params::Fp, y: &params::UInt) {
     let mut y_fp = params::Fp { c: [0; params::LIMBS] };
     for i in 0..params::LIMBS {

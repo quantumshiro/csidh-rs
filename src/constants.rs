@@ -29,8 +29,7 @@ pub const P: params::UInt = params::UInt {
 pub const P_COFACTOR: [u64; 8] = [4, 0, 0, 0, 0, 0, 0, 0];
 pub const FP_0: [params::Fp; 8] = [params::Fp { c: [0; 8] }; 8];
 
-pub const FP_1: [params::Fp; 8] = [
-    params::Fp { 
+pub const FP_1: params::Fp = params::Fp {
         c: [0x1b81b90533c6c87b, 
             0xc2721bf457aca835, 
             0x516730cc1f0b4f25, 
@@ -38,9 +37,8 @@ pub const FP_1: [params::Fp; 8] = [
             0x5afbfcc69322c9cd, 
             0xb42d083aedc88c42, 
             0xfc8ab0d15e3e4c4a, 
-            0x65b48e8f740f89bf] 
-        }; 8
-];
+            0x65b48e8f740f89bf]
+};
 
 pub const R_SQUARED_MOD_P: params::Fp = params::Fp {
         c: [
@@ -60,16 +58,23 @@ pub const R_SQUARED_MOD_P: params::Fp = params::Fp {
 
 pub const INV_MIN_P_MOD_R: u64 = 0x66c1301f632e294d;
 
-pub const P_MINUS_HAVES: [u64; 8] = [
-    0x8dc0dc8299e3643d,
-    0xe1390dfa2bd6541a,
-    0xa8b398660f85a792,
-    0xd3d56362b3f9aa83,
-    0x2d7dfe63499164e6,
-    0x5a16841d76e44621,
-    0xfe455868af1f2625,
-    0x32da4747ba07c4df,
-];
+pub const P_MINUS_2: params::UInt = params::UInt {
+    c: [
+        0x1b81b90533c6c879, 0xc2721bf457aca835, 0x516730cc1f0b4f25, 0xa7aac6c567f35507,
+        0x5afbfcc69322c9cd, 0xb42d083aedc88c42, 0xfc8ab0d15e3e4c4a, 0x65b48e8f740f89bf,
+    ]
+};
+
+pub const P_MINUS_1_HALVES: params::UInt = params::UInt {
+    c: [0x8dc0dc8299e3643d,
+        0xe1390dfa2bd6541a,
+        0xa8b398660f85a792,
+        0xd3d56362b3f9aa83,
+        0x2d7dfe63499164e6,
+        0x5a16841d76e44621,
+        0xfe455868af1f2625,
+        0x32da4747ba07c4df,]
+};
 
 pub const FOUR_SQRT_P: [u64; 5] = [
     0x17895e71e1a20b3f,
