@@ -1,4 +1,4 @@
-use crate::params::{self, LIMBS, Fp};
+use crate::{params::{self, LIMBS, Fp}, rng::random_bytes};
 use crate::uint::{self};
 use crate::rng::{self};
 use crate::constants::{self, P};
@@ -89,8 +89,28 @@ pub fn fp_issquare(x: &params::Fp) -> bool {
 }
 
 
-pub fn fp_random(x: &params::Fp) {
-    
+pub fn fp_random(x: &mut params::Fp) {
+    // convert params::Fp -> &mut [u8];
+    let mut x_bytes: [u8; params::LIMBS * 8] = [0; params::LIMBS * 8];
+    for i in 0..params::LIMBS {
+        for j in 0..8 {
+            x_bytes[i * 8 + j] = x.c[i] as u8;
+        }
+    }
+    loop {
+        random_bytes(&mut x_bytes).unwrap();
+        let m: u64 = (1u64 << (constants::PBITS % 64)) - 1;
+        x.c[params::LIMBS - 1] &= m;
+
+        for i in (0..params::LIMBS).rev() {
+            if x.c[i] < constants::P.c[i] {
+                break;
+            }
+            if x.c[i] > constants::P.c[i] {
+                continue;
+            }
+        }
+    } 
 }
 
 pub fn fp_enc(x: &mut params::Fp, y: &params::UInt) {

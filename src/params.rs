@@ -2,17 +2,17 @@ pub const LIMBS: usize = 8;
 pub const NUM_PRIMES: usize = 74;
 pub const MAX_EXPONENT: usize = 5;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct UInt {
     pub c: [u64; LIMBS],
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Fp {
     pub c: [u64; LIMBS],
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Proj {
     pub x: Fp,
     pub z: Fp,
