@@ -76,13 +76,16 @@ pub const P_MINUS_1_HALVES: params::UInt = params::UInt {
         0x32da4747ba07c4df,]
 };
 
-pub const FOUR_SQRT_P: [u64; 5] = [
-    0x17895e71e1a20b3f,
-    0x38d0cd95f8636a56,
-    0x142b9541e59682cd,
-    0x856f1399d91d6592,
-    0x02,
-];
+pub const FOUR_SQRT_P: params::UInt = params::UInt {
+    c: [0x17895e71e1a20b3f,
+        0x38d0cd95f8636a56,
+        0x142b9541e59682cd,
+        0x856f1399d91d6592,
+        0x02,
+        0x00,
+        0x00,
+        0x00,]
+};
 
 /* x = 7 has full order on E0; this is 1/(7^2-1). */
 pub const FIRST_ELLIGATOR_RAND: [params::Fp; 8] = [
