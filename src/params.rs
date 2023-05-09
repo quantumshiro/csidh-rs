@@ -1,21 +1,21 @@
-const LIMBS: usize = 8;
-const NUM_PRIMES: usize = 74;
-const MAX_EXPONENT: usize = 5;
+pub const LIMBS: usize = 8;
+pub const NUM_PRIMES: usize = 74;
+pub const MAX_EXPONENT: usize = 5;
 
-#[derive(Clone, Copy)]
-struct UInt {
-    c: [u64; LIMBS],
+#[derive(Clone, Copy, Debug)]
+pub struct UInt {
+    pub c: [u64; LIMBS],
 }
 
-#[derive(Clone, Copy)]
-struct Fp {
-    c: [u64; LIMBS],
+#[derive(Clone, Copy, Debug)]
+pub struct Fp {
+    pub c: [u64; LIMBS],
 }
 
-#[derive(Clone, Copy)]
-struct Proj {
-    x: Fq,
-    z: Fq,
+#[derive(Clone, Copy, Debug)]
+pub struct Proj {
+    pub x: Fp,
+    pub z: Fp,
 }
 
 static PRIMES: [u32; NUM_PRIMES] = [
