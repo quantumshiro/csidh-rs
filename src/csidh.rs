@@ -50,7 +50,7 @@ pub fn validate_rec(p: &mut params::Proj, a: &params::Proj, lower: usize, upper:
             let mut tmp: params::UInt = params::UInt { c: [0; params::LIMBS] };
             uint::uint_set(&mut tmp, params::PRIMES[lower].into());
             let mut p_tmp = *p;
-            mont::xMUL(&mut p_tmp, a, p, &mut tmp);
+            mont::xMUL(&mut p_tmp, a, p, &tmp);
 
             if p.z != constants::FP_0 {
                 *is_supersingular = false;
@@ -86,7 +86,7 @@ pub fn validate_rec(p: &mut params::Proj, a: &params::Proj, lower: usize, upper:
         z: params::Fp { c: [0; params::LIMBS] },
     };
 
-    mont::xMUL(&mut q, a, p, &mut cu);
+    mont::xMUL(&mut q, a, p, &cu);
     let mut p_copy = *p;
     mont::xMUL(&mut p_copy, a, p, &cl);
 
@@ -94,4 +94,50 @@ pub fn validate_rec(p: &mut params::Proj, a: &params::Proj, lower: usize, upper:
     let right_result = validate_rec(&mut q, a, mid, upper, order, is_supersingular);
 
     left_result || right_result
+}
+
+pub fn validate(invalid: &PublicKey) -> bool {
+    {
+        let mut dummy: params::UInt = params::UInt { c: [0; params::LIMBS] };
+        let mut invalid_uint: params::UInt = params::UInt { c: [0; params::LIMBS] };
+        for i in 0..params::LIMBS {
+            // copy invalid_uint.c[i] = invalid.a.c[i];
+            invalid_uint.c[i] = invalid.a.c[i];
+        }
+        (uint::uint_sub3(&mut dummy, &invalid_uint, &constants::P));
+
+        let mut fp_pm2: params::Fp = params::Fp { c: [0; params::LIMBS] };
+        fp::fp_set(&mut fp_pm2, 2);
+
+        if invalid.a != fp_pm2 {
+            return false;
+        }
+        let fp_pm2_tmp = fp_pm2;
+        fp::fp_sub3(&mut fp_pm2, &constants::FP_0, &fp_pm2_tmp);
+        if invalid.a != fp_pm2 {
+            return false;
+        }
+    }
+    let a: params::Proj = params::Proj {
+        x: invalid.a,
+        z: constants::FP_1,
+    };
+    loop {
+        let mut p = params::Proj {
+            x: params::Fp { c: [0; params::LIMBS] },
+            z: params::Fp { c: [0; params::LIMBS] },
+        };
+        fp::fp_random(&mut p.x);
+        p.z = constants::FP_1;
+        let p_tmp = p;
+        mont::x_dbl(&mut p, &a, &p_tmp);
+        mont::x_dbl(&mut p, &a, &p_tmp);
+
+        let mut is_supersingular = false;
+        let mut order = uint::UINT_1;
+
+        if validate_rec(&mut p, &a, 0, params::NUM_PRIMES, &mut order, &mut is_supersingular) {
+            return is_supersingular;
+        }
+    }
 }
