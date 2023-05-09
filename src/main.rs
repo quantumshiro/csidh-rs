@@ -4,6 +4,7 @@ mod params;
 mod constants;
 mod fp;
 mod mont;
+mod csidh;
 
 fn main() {
     let mut x = [0u8; 16];
