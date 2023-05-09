@@ -27,7 +27,7 @@ pub const P: params::UInt = params::UInt {
 
 
 pub const P_COFACTOR: [u64; 8] = [4, 0, 0, 0, 0, 0, 0, 0];
-pub const FP_0: [params::Fp; 8] = [params::Fp { c: [0; 8] }; 8];
+pub const FP_0: params::Fp = params::Fp { c: [0; 8] };
 
 pub const FP_1: params::Fp = params::Fp {
         c: [0x1b81b90533c6c87b, 

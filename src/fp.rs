@@ -1,10 +1,57 @@
 use crate::{params::{self, LIMBS, Fp}, rng::random_bytes};
-use crate::uint::{self};
+use crate::uint::{self,};
 use crate::rng::{self};
 use crate::constants::{self, P};
 
+pub fn fp_add3(x: &mut params::Fp, y: &params::Fp, z: &params::Fp) {
+    // x: convert &mut params::Fp -> &params::UInt
+    // y: convert &params::Fp -> &params::UInt
+    // z: convert &params::Fp -> &params::UInt
 
-// Montgomery arithmetic
+    let mut x_uint = params::UInt { c: x.c };
+    let mut y_uint = params::UInt { c: y.c };
+    let mut z_uint = params::UInt { c: z.c };
+
+    for i in 0..params::LIMBS {
+        x_uint.c[i] = x.c[i];
+        y_uint.c[i] = y.c[i];
+        z_uint.c[i] = z.c[i];
+    }
+
+    uint::uint_add3(&mut x_uint, &y_uint, &z_uint);
+}
+
+pub fn fp_add2(x: &mut params::Fp, y: &params::Fp) {
+    let mut tmp = params::Fp { c: [0; params::LIMBS] };
+    for i in 0..params::LIMBS {
+        tmp.c[i] = x.c[i];
+    }
+    fp_add3(x, &tmp, y);
+}
+
+pub fn fp_sub3(x: &mut params::Fp, y: &params::Fp, z: &params::Fp) {
+    let mut x_uint = params::UInt { c: x.c };
+    let mut y_uint = params::UInt { c: y.c };
+    let mut z_uint = params::UInt { c: z.c };
+
+    for i in 0..params::LIMBS {
+        x_uint.c[i] = x.c[i];
+        y_uint.c[i] = y.c[i];
+        z_uint.c[i] = z.c[i];
+    }
+
+    uint::uint_sub3(&mut x_uint, &y_uint, &z_uint);
+}
+
+pub fn fp_sub2(x: &mut params::Fp, y: &params::Fp) {
+    let mut tmp = params::Fp { c: [0; params::LIMBS] };
+    for i in 0..params::LIMBS {
+        tmp.c[i] = x.c[i];
+    }
+    fp_sub3(x, &tmp, y);
+}
+
+
 pub fn fp_mul3(x: &mut params::Fp, y: &params::Fp, z: &params::Fp) {
     let mut t: [u64; params::LIMBS + 1] = [0; params::LIMBS + 1];
 
@@ -113,6 +160,7 @@ pub fn fp_random(x: &mut params::Fp) {
     } 
 }
 
+// Montgomery arithmetic
 pub fn fp_enc(x: &mut params::Fp, y: &params::UInt) {
     let mut y_fp = params::Fp { c: [0; params::LIMBS] };
     for i in 0..params::LIMBS {
@@ -134,7 +182,16 @@ pub fn fp_dec(x: &mut params::UInt, y: &params::Fp) {
     fp_mul3(&mut x_fp, y, &fp_uint_1);
 }
 
+pub fn fp_set(x: &mut params::Fp, y: u64) {
+    // x convert Fp to UInt
+    let mut x_uint = params::UInt { c: [0; params::LIMBS] };
+    for i in 0..params::LIMBS {
+        x_uint.c[i] = x.c[i];
+    }
+    uint::uint_set(&mut x_uint, y);
 
+    fp_enc(x, &x_uint);
+}
 pub fn reduce_once(x: &mut params::UInt) {
     let mut t = params::UInt { c: [0; params::LIMBS] };
 
