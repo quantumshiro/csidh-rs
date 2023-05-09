@@ -3,7 +3,7 @@ mod uint;
 mod params;
 mod constants;
 mod fp;
-
+mod mont;
 
 fn main() {
     let mut x = [0u8; 16];
