@@ -141,3 +141,13 @@ pub fn validate(invalid: &PublicKey) -> bool {
         }
     }
 }
+
+pub fn montgomety_rhs(rhs: &mut params::Fp, a: &params::Fp, x: &params::Fp) {
+    let mut tmp: params::Fp = params::Fp { c: [0; params::LIMBS] };
+    *rhs = *x;
+    fp::fp_sq1(rhs);
+    fp::fp_mul3(&mut tmp, a, x);
+    fp::fp_add2(rhs, &tmp);
+    fp::fp_add2(rhs, &constants::FP_1);
+    fp::fp_mul2(rhs, x);
+}
