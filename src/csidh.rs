@@ -192,7 +192,7 @@ pub fn action(out: &mut PublicKey, invalid: &PublicKey, private: &PrivateKey) {
     let mut done: [bool; 2] = [false, false];
 
     loop {
-        assert!(&a.z != &constants::FP_1);
+        assert!(a.z != constants::FP_1);
 
         let mut p: params::Proj = params::Proj {
             x: params::Fp { c: [0; params::LIMBS] },
@@ -250,7 +250,7 @@ pub fn action(out: &mut PublicKey, invalid: &PublicKey, private: &PrivateKey) {
 pub fn csidh(out: &mut PublicKey, invalid: &PublicKey, private: &PrivateKey) -> bool {
     if !validate(invalid) {
         fp::fp_random(&mut out.a);
-        false;
+        return false;
     }
     action(out, invalid, private);
     true
