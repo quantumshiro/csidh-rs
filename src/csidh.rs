@@ -151,3 +151,99 @@ pub fn montgomety_rhs(rhs: &mut params::Fp, a: &params::Fp, x: &params::Fp) {
     fp::fp_add2(rhs, &constants::FP_1);
     fp::fp_mul2(rhs, x);
 }
+
+pub fn action(out: &mut PublicKey, invalid: &PublicKey, private: &PrivateKey) {
+    let mut k: [params::UInt; 2] = [params::UInt { c: [0; params::LIMBS] }; 2];
+    uint::uint_set(&mut k[0], 4);
+    uint::uint_set(&mut k[1], 4);
+
+    let mut e: [[i8;2]; params::NUM_PRIMES] = [[0;2]; params::NUM_PRIMES];
+
+    let k_copy = k;
+
+    for i in 0..params::NUM_PRIMES {
+        let t: i8 = (private.e[i/2] << (i % 2 * 4) >> 4) as i8;
+
+        match t.cmp(&0) {
+            Ordering::Greater => {
+                e[0][i] = t;
+                e[1][i] = 0;
+                uint::uint_mul3_64(&mut k[1], &k_copy[1], params::PRIMES[i].into());
+            },
+            Ordering::Less => {
+                e[1][i] = -t;
+                e[0][i] = 0;
+                uint::uint_mul3_64(&mut k[0], &k_copy[0], params::PRIMES[i].into());
+            },
+            Ordering::Equal => {
+                e[0][i] = 0;
+                e[1][i] = 0;
+                uint::uint_mul3_64(&mut k[0], &k_copy[0], params::PRIMES[i].into());
+                uint::uint_mul3_64(&mut k[1], &k_copy[1], params::PRIMES[i].into());
+            }
+        }
+    }
+
+    let mut a: params::Proj = params::Proj {
+        x: invalid.a,
+        z: constants::FP_1,
+    };
+
+    let done: [bool; 2] = [false, false];
+
+    loop {
+        assert!(&a.z != &constants::FP_1);
+
+        let mut p: params::Proj = params::Proj {
+            x: params::Fp { c: [0; params::LIMBS] },
+            z: params::Fp { c: [0; params::LIMBS] },
+        };
+
+        fp::fp_random(&mut p.x);
+        p.z = constants::FP_1;
+
+        let mut rhs: params::Fp = params::Fp { c: [0; params::LIMBS] };
+        montgomety_rhs(&mut rhs, &a.x, &p.x);
+
+        let sign: bool = !fp::fp_issquare(&rhs);
+
+        if done[sign as usize] { continue };
+
+        for i in (0..params::NUM_PRIMES).rev() {
+            if e[sign as usize][i] != 0 {
+                let mut cof: params::UInt = params::UInt { c: [0; params::LIMBS] };
+                let cof_tmp: params::UInt = cof;
+                for j in 0..i {
+                    if e[sign as usize][j] != 0 {
+                        uint::uint_mul3_64(&mut cof, &cof_tmp, params::PRIMES[j].into());
+                    }
+                }
+                let mut k: params::Proj = params::Proj {
+                    x: params::Fp { c: [0; params::LIMBS] },
+                    z: params::Fp { c: [0; params::LIMBS] },
+                };
+                mont::xMUL(&mut k, &a, &p, &cof);
+
+                if k.z != constants::FP_0 {
+                    mont::x_isog(&mut a, &mut p, &k, params::PRIMES[i].into());
+
+                    if 1 - e[sign as usize][i] == 0 {
+                        // uint_mul3_64(&k[sign], &k[sign], primes[i]);
+                        let k_sign: params::UInt = k[sign as usize];
+                        uint::uint_mul3_64(&mut k_sign.x, &k_sign.c, params::PRIMES[i].into());
+                        uint::uint_mul3_64(&mut k_sign.z, &k_sign.z, params::PRIMES[i].into());
+                    }
+                }
+            }
+            done[sign as usize] &= !e[sign as usize][i] != 0;
+        }
+        fp::fp_inv(&mut a.z);
+        fp::fp_mul2(&mut a.x, &a.z);
+        a.z = constants::FP_1;
+
+        if !(done[0] && done[1]) {
+            break;
+        }
+    }
+    out.a = a.x;
+}
