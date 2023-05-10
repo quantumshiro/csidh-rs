@@ -18,7 +18,7 @@ pub struct PublicKey {
 
 // const public_key base = {0}; /* A = 0 */
 pub const BASE: PublicKey = PublicKey {
-     a: params::Fp { 
+    a: params::Fp { 
         c: [0, 0, 0, 0, 0, 0, 0, 0] 
     } 
 };
