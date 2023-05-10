@@ -247,3 +247,12 @@ pub fn action(out: &mut PublicKey, invalid: &PublicKey, private: &PrivateKey) {
     }
     out.a = a.x;
 }
+
+pub fn csidh(out: &mut PublicKey, invalid: &PublicKey, private: &PrivateKey) -> bool {
+    if (!validate(invalid)) {
+        fp::fp_random(&mut out.a);
+        false;
+    }
+    action(out, invalid, private);
+    true
+}
