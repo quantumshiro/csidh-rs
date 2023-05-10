@@ -189,7 +189,7 @@ pub fn action(out: &mut PublicKey, invalid: &PublicKey, private: &PrivateKey) {
         z: constants::FP_1,
     };
 
-    let done: [bool; 2] = [false, false];
+    let mut done: [bool; 2] = [false, false];
 
     loop {
         assert!(&a.z != &constants::FP_1);
@@ -218,20 +218,19 @@ pub fn action(out: &mut PublicKey, invalid: &PublicKey, private: &PrivateKey) {
                         uint::uint_mul3_64(&mut cof, &cof_tmp, params::PRIMES[j].into());
                     }
                 }
-                let mut k: params::Proj = params::Proj {
+                let mut q: params::Proj = params::Proj {
                     x: params::Fp { c: [0; params::LIMBS] },
                     z: params::Fp { c: [0; params::LIMBS] },
                 };
-                mont::xMUL(&mut k, &a, &p, &cof);
+                mont::xMUL(&mut q, &a, &p, &cof);
 
-                if k.z != constants::FP_0 {
-                    mont::x_isog(&mut a, &mut p, &k, params::PRIMES[i].into());
+                if q.z != constants::FP_0 {
+                    mont::x_isog(&mut a, &mut p, &q, params::PRIMES[i].into());
 
                     if 1 - e[sign as usize][i] == 0 {
-                        // uint_mul3_64(&k[sign], &k[sign], primes[i]);
-                        let k_sign: params::UInt = k[sign as usize];
-                        uint::uint_mul3_64(&mut k_sign.x, &k_sign.c, params::PRIMES[i].into());
-                        uint::uint_mul3_64(&mut k_sign.z, &k_sign.z, params::PRIMES[i].into());
+                        let k_tmp = k[sign as usize];
+                        uint::uint_mul3_64(&mut k[sign as usize], &k_tmp, params::PRIMES[i].into());
+
                     }
                 }
             }
@@ -249,7 +248,7 @@ pub fn action(out: &mut PublicKey, invalid: &PublicKey, private: &PrivateKey) {
 }
 
 pub fn csidh(out: &mut PublicKey, invalid: &PublicKey, private: &PrivateKey) -> bool {
-    if (!validate(invalid)) {
+    if !validate(invalid) {
         fp::fp_random(&mut out.a);
         false;
     }
