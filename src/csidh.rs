@@ -1,3 +1,5 @@
+use rand::{rngs::OsRng, RngCore};
+
 use crate::uint;
 use crate::fp;
 use crate::mont;
@@ -24,22 +26,25 @@ pub const BASE: PublicKey = PublicKey {
 };
 
 pub fn csidh_private(private: &mut PrivateKey) {
-    unsafe { ptr::write_bytes(&mut private.e, 0, (params::NUM_PRIMES + 1)/2) };
+    unsafe { 
+        ptr::write_bytes(private.e.as_mut_ptr() as *mut u8, 0, (params::NUM_PRIMES + 1)/2) 
+    };
     
-    for mut i in 0..(private.e).len() {
+    let mut i = 0;
+    let mut rng = OsRng;
+    while i < params::NUM_PRIMES {
         let mut buf: [u8; 64] = [0; 64];
-        rng::random_bytes(&mut buf).unwrap();
+        rng.fill_bytes(&mut buf);
         for &byte in &buf {
             if byte <= params::MAX_EXPONENT as u8 && byte >= (-(params::MAX_EXPONENT as i8))as u8 {
-                private.e[i/2] = ((byte & 0xf) << (i % 2 * 4)) as i8;
-                if { i += 1; i } >= params::NUM_PRIMES {
+                private.e[i/2] |= ((byte & 0xf) << (i % 2 * 4)) as i8;
+                i += 1;
+                if i >= params::NUM_PRIMES {
                     break;
                 }
             }
         }
-
     }
-
 }
 
 pub fn validate_rec(p: &mut params::Proj, a: &params::Proj, lower: usize, upper: usize, order: &mut params::UInt, is_supersingular: &mut bool) -> bool {
@@ -192,7 +197,7 @@ pub fn action(out: &mut PublicKey, invalid: &PublicKey, private: &PrivateKey) {
     let mut done: [bool; 2] = [false, false];
 
     loop {
-        assert!(a.z != constants::FP_1);
+        assert!(&a.z != &constants::FP_1);
 
         let mut p: params::Proj = params::Proj {
             x: params::Fp { c: [0; params::LIMBS] },
