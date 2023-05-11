@@ -1,5 +1,5 @@
-use crate::{params::{self, LIMBS, Fp}, rng::random_bytes};
-use crate::uint::{self,};
+use crate::params::{self, LIMBS, Fp};
+use crate::uint::{self};
 use crate::rng::{self};
 use crate::constants::{self, P};
 
@@ -145,7 +145,7 @@ pub fn fp_random(x: &mut params::Fp) {
         }
     }
     loop {
-        random_bytes(&mut x_bytes).unwrap();
+        rng::randombytes(&mut x_bytes).unwrap();
         let m: u64 = (1u64 << (constants::PBITS % 64)) - 1;
         x.c[params::LIMBS - 1] &= m;
 

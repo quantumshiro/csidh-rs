@@ -7,19 +7,10 @@ use std::sync::Once;
 static mut FD: Option<File> = None;
 static INIT: Once = Once::new();
 
-pub fn random_bytes(x: &mut [u8]) -> Result<()> {
-
-    INIT.call_once(|| {
-        let file = File::open("/dev/urandom").expect("failed to open /dev/urandom");
-        unsafe {
-            FD = Some(file);
-        }
-    });
-
-    for i in 0..x.len() {
-        let n = unsafe {
-            FD.as_ref().unwrap().read(&mut x[i..]).unwrap()
-        };
+pub fn randombytes(buf: &mut [u8]) -> Result<()> {
+    let mut fd = unsafe { File::open("/dev/urandom").expect("failed to open /dev/urandom") };
+    for i in 0..buf.len() {
+        let n = unsafe { fd.read(&mut buf[i..]).expect("failed to read from /dev/urandom") };
         if n == 0 {
             panic!("EOF reached");
         }
@@ -34,7 +25,7 @@ mod rng_test {
     #[test]
     fn test_random_bytes() {
         let mut x = [0u8; 16];
-        random_bytes(&mut x).unwrap();
+        randombytes(&mut x).expect("Failed to read random bytes");
         println!("{:?}", x);
     }
 }
