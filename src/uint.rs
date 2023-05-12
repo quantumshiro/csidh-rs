@@ -40,9 +40,13 @@ pub fn uint_sub3(x: &mut params::UInt, y: &params::UInt, z: &params::UInt) -> bo
 pub fn uint_mul3_64(x: &mut params::UInt, y: &params::UInt, z: u64) {
     let mut carry: bool = false;
     for i in 0..params::LIMBS {
-        let t = (y.c[i] as u128) * (z as u128) + (carry as u128);
-        carry = (t >> 64) != 0;
-        x.c[i] = t as u64;
+        // let t = (y.c[i] as u128) * (z as u128) + (carry as u128);
+        // carry = (t >> 64) != 0;
+        // x.c[i] = t as u64;
+        let (t, overflow) = y.c[i].overflowing_mul(z);
+        let (t, overflow2) = t.overflowing_add(carry as u64);
+        carry = overflow || overflow2;
+        x.c[i] = t;
     }
 }
 

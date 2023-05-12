@@ -98,8 +98,8 @@ pub fn validate_rec(
     mont::xMUL(&mut q, a, p, &cu);
     mont::xMUL(p, a, &p_copy, &cl);
     
-    return validate_rec(&mut q, a, mid, upper, order, is_supersingular)
-        || validate_rec(p, a, lower, mid, order, is_supersingular);
+    validate_rec(&mut q, a, mid, upper, order, is_supersingular)
+        || validate_rec(p, a, lower, mid, order, is_supersingular)
 }
 
 pub fn validate(invalid: &PublicKey) -> bool {

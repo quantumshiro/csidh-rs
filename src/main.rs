@@ -27,8 +27,12 @@ fn main() {
     let mut private_alice: csidh::PrivateKey = csidh::PrivateKey {
         e: [0; (params::NUM_PRIMES + 1) / 2]
     };
-    let mut private_bob: csidh::PrivateKey;
-    let mut public_alice: csidh::PublicKey;
+    let mut private_bob: csidh::PrivateKey = csidh::PrivateKey {
+        e: [0; (params::NUM_PRIMES + 1) / 2]
+    };
+    let mut public_alice: csidh::PublicKey = csidh::PublicKey {
+        a: params::Fp { c: [0; params::LIMBS] }
+    };
     let mut public_bob: csidh::PublicKey;
     let mut shared_alice: csidh::PublicKey;
     let mut shared_bob: csidh::PublicKey;
@@ -39,8 +43,16 @@ fn main() {
     println!("Alice's private key:");
     for i in 0..(params::NUM_PRIMES + 1) / 2 {
         print!("{:02x}", private_alice.e[i]);
+        print!(" ");
     }
 
+    csidh::csidh_private(&mut private_bob);
+    println!("\nBob's private key:");
+    for i in 0..(params::NUM_PRIMES + 1) / 2 {
+        print!("{:02x}", private_bob.e[i]);
+        print!(" ");
+    }
 
+    csidh::csidh(&mut public_alice, &csidh::BASE, &private_bob);
     
 }

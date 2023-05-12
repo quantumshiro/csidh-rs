@@ -56,13 +56,13 @@ pub fn fp_mul3(x: &mut params::Fp, y: &params::Fp, z: &params::Fp) {
     let mut t: [u64; params::LIMBS + 1] = [0; params::LIMBS + 1];
 
     for k in 0..params::LIMBS {
-        let m = constants::INV_MIN_P_MOD_R * (y.c[k] * z.c[0] + t[(k) % (params::LIMBS + 1)]);
+        let m: u128 = constants::INV_MIN_P_MOD_R as u128 * (y.c[k] as u128 * z.c[0] as u128 + t[(k) % (params::LIMBS + 1)] as u128);
 
         let mut c: bool = false;
         let mut o: bool = false;
 
         for i in 0..params::LIMBS {
-            let u: u128 = (m as u128) * (constants::P.c[i] as u128);
+            let u: u128 = m * constants::P.c[i] as u128;
             o |= t[(k + i) % (params::LIMBS + 1)].checked_add(u as u64).map_or(true, |v| {
                 t[(k + i) % (params::LIMBS + 1)] = v;
                 false
@@ -197,5 +197,21 @@ pub fn reduce_once(x: &mut params::UInt) {
 
     if !uint::uint_sub3(&mut t, x, &constants::P) {
         *x = t;
+    }
+}
+
+#[cfg(test)]
+mod fp_test {
+    use super::*;
+
+    #[test]
+    fn fp_mul_test() {
+        let mut x = params::Fp { c: [0; params::LIMBS] };
+        let mut y = params::Fp { c: [0; params::LIMBS] };
+        let mut z = params::Fp { c: [0; params::LIMBS] };
+        fp_set(&mut x, 2);
+        fp_set(&mut y, 3);
+        fp_mul3(&mut z, &x, &y);
+        assert_eq!(z.c[0], 6);          
     }
 }
