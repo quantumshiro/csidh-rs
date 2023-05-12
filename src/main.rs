@@ -1,3 +1,5 @@
+use std::println;
+
 mod rng;
 mod uint;
 mod params;
@@ -53,6 +55,6 @@ fn main() {
         print!(" ");
     }
 
-    csidh::csidh(&mut public_alice, &csidh::BASE, &private_bob);
+    csidh::csidh(&mut public_alice, &csidh::BASE, &private_alice);
     
 }

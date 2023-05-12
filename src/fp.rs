@@ -62,7 +62,7 @@ pub fn fp_mul3(x: &mut params::Fp, y: &params::Fp, z: &params::Fp) {
         let mut o: bool = false;
 
         for i in 0..params::LIMBS {
-            let u: u128 = m * constants::P.c[i] as u128;
+            let u: u128 = m.overflowing_mul(constants::P.c[i] as u128).0;
             o |= t[(k + i) % (params::LIMBS + 1)].checked_add(u as u64).map_or(true, |v| {
                 t[(k + i) % (params::LIMBS + 1)] = v;
                 false

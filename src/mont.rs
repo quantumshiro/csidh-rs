@@ -169,7 +169,7 @@ pub fn xMUL(q: &mut params::Proj, a: &params::Proj, p: &params::Proj, k: &params
         i -= 1;
     }
 
-    loop {
+    while i > 0 {
         let bit: bool = !uint::uint_bit(k, i);
 
         
@@ -191,12 +191,6 @@ pub fn xMUL(q: &mut params::Proj, a: &params::Proj, p: &params::Proj, k: &params
         if bit {
             std::mem::swap(&mut (*q), &mut r);
         }
-
-        i -= 1;
-        if i == 0 {
-            break;
-        }
-        
     }
 }
 

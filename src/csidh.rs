@@ -197,7 +197,7 @@ pub fn action(out: &mut PublicKey, invalid: &PublicKey, private: &PrivateKey) {
 
     let mut done: [bool; 2] = [false, false];
 
-    loop {
+    while !(done[0] && done[1]) {
         assert!(&a.z != &constants::FP_1);
 
         let mut p: params::Proj = params::Proj {
@@ -246,9 +246,6 @@ pub fn action(out: &mut PublicKey, invalid: &PublicKey, private: &PrivateKey) {
         fp::fp_mul2(&mut a.x, &a.z);
         a.z = constants::FP_1;
 
-        if !(done[0] && done[1]) {
-            break;
-        }
     }
     out.a = a.x;
 }
