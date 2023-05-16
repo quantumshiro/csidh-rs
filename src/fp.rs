@@ -214,4 +214,11 @@ mod fp_test {
         fp_mul3(&mut z, &x, &y);
         assert_eq!(z.c[0], 6);          
     }
+
+    #[test]
+    fn fp_random_test() {
+        let mut x = params::Fp { c: [0; params::LIMBS] };
+        fp_random(&mut x);
+        dbg!(x.c);
+    }
 }

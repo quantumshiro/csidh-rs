@@ -168,7 +168,7 @@ pub fn action(out: &mut PublicKey, invalid: &PublicKey, private: &PrivateKey) {
     let k_copy = k;
 
     for i in 0..params::NUM_PRIMES {
-        let t: i8 = (private.e[i/2] << (i % 2 * 4) >> 4) as i8;
+        let t: i8 = private.e[i/2] << (i % 2 * 4) >> 4;
 
         match t.cmp(&0) {
             Ordering::Greater => {
@@ -198,7 +198,7 @@ pub fn action(out: &mut PublicKey, invalid: &PublicKey, private: &PrivateKey) {
     let mut done: [bool; 2] = [false, false];
 
     while !(done[0] && done[1]) {
-        assert!(&a.z != &constants::FP_1);
+        assert!(a.z != constants::FP_1);
 
         let mut p: params::Proj = params::Proj {
             x: params::Fp { c: [0; params::LIMBS] },
