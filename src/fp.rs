@@ -151,10 +151,10 @@ pub fn fp_random(x: &mut params::Fp) {
 
         for i in (0..params::LIMBS).rev() {
             if x.c[i] < constants::P.c[i] {
-                break;
+                return;
             }
             if x.c[i] > constants::P.c[i] {
-                continue;
+                break;
             }
         }
     } 
