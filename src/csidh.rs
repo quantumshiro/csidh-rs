@@ -60,7 +60,7 @@ pub fn validate_rec(
             let mut tmp: params::UInt = params::UInt { c: [0; params::LIMBS] };
             uint::uint_set(&mut tmp, params::PRIMES[lower].into());
             let p_tmp = *p;
-            mont::xMUL(p, a, &p_tmp, &tmp);
+            mont::x_mul(p, a, &p_tmp, &tmp);
 
             if p.z != constants::FP_0 {
                 *is_supersingular = false;
@@ -95,8 +95,8 @@ pub fn validate_rec(
     };
 
     let p_copy = *p;
-    mont::xMUL(&mut q, a, p, &cu);
-    mont::xMUL(p, a, &p_copy, &cl);
+    mont::x_mul(&mut q, a, p, &cu);
+    mont::x_mul(p, a, &p_copy, &cl);
     
     validate_rec(&mut q, a, mid, upper, order, is_supersingular)
         || validate_rec(p, a, lower, mid, order, is_supersingular)
@@ -228,7 +228,7 @@ pub fn action(out: &mut PublicKey, invalid: &PublicKey, private: &PrivateKey) {
                     x: params::Fp { c: [0; params::LIMBS] },
                     z: params::Fp { c: [0; params::LIMBS] },
                 };
-                mont::xMUL(&mut q, &a, &p, &cof);
+                mont::x_mul(&mut q, &a, &p, &cof);
 
                 if q.z != constants::FP_0 {
                     mont::x_isog(&mut a, &mut p, &q, params::PRIMES[i].into());
@@ -240,7 +240,7 @@ pub fn action(out: &mut PublicKey, invalid: &PublicKey, private: &PrivateKey) {
                     }
                 }
             }
-            done[sign as usize] &= !e[sign as usize][i] != 0;
+            done[sign as usize] &= e[sign as usize][i] == 0;
         }
         fp::fp_inv(&mut a.z);
         fp::fp_mul2(&mut a.x, &a.z);

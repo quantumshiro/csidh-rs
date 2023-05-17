@@ -156,7 +156,7 @@ pub fn x_add(s: &mut params::Proj, p: &params::Proj, q: &params::Proj, pq: &para
 /* Montgomery ladder. */
 /* P must not be the unique point of order 2. */
 /* not constant-time! */
-pub fn xMUL(q: &mut params::Proj, a: &params::Proj, p: &params::Proj, k: &params::UInt) {
+pub fn x_mul(q: &mut params::Proj, a: &params::Proj, p: &params::Proj, k: &params::UInt) {
     let mut r: params::Proj = *p;
 
     let pcopy: params::Proj = *p;

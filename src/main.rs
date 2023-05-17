@@ -14,7 +14,6 @@ pub fn uint_print(x: &params::UInt) {
     for i in (0..8*params::LIMBS).rev() {
         // printf("%02hhx", i[(unsigned char *) x->c]);
         print!("{:02x}", x.c[i/8] >> (8*(i%8)) as u64 & 0xff);
-        print!(" ");
     }
 }
 
