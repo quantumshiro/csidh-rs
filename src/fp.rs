@@ -138,15 +138,18 @@ pub fn fp_issquare(x: &params::Fp) -> bool {
 
 pub fn fp_random(x: &mut params::Fp) {
     // convert params::Fp -> &mut [u8];
-    let mut x_bytes: [u8; params::LIMBS * 8] = [0; params::LIMBS * 8];
-    for i in 0..params::LIMBS {
-        for j in 0..8 {
-            x_bytes[i * 8 + j] = x.c[i] as u8;
-        }
-    }
     loop {
-        rng::randombytes(&mut x_bytes).unwrap();
+        let mut x_bytes: [u8; params::LIMBS * 8] = [0; params::LIMBS * 8];
+        rng::randombytes(&mut x_bytes).expect("Error generating random bytes");
         let m: u64 = (1u64 << (constants::PBITS % 64)) - 1;
+        // copy x_bytes to x.c
+        for i in 0..params::LIMBS {
+            x.c[i] = x_bytes[i * 8] as u64;
+            for j in 1..8 {
+                x.c[i] |= (x_bytes[i * 8 + j] as u64) << (j * 8);
+            }
+        }
+        // x_bytes[params::LIMBS * 8 - 1] &= m as u8;
         x.c[params::LIMBS - 1] &= m;
 
         for i in (0..params::LIMBS).rev() {
