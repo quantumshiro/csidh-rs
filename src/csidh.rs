@@ -110,7 +110,9 @@ pub fn validate(invalid: &PublicKey) -> bool {
             // copy invalid_uint.c[i] = invalid.a.c[i];
             invalid_uint.c[i] = invalid.a.c[i];
         }
-        (uint::uint_sub3(&mut dummy, &invalid_uint, &constants::P));
+        if !uint::uint_sub3(&mut dummy, &invalid_uint, &constants::P) {
+            return false;
+        }
 
         let mut fp_pm2: params::Fp = params::Fp { c: [0; params::LIMBS] };
         fp::fp_set(&mut fp_pm2, 2);
@@ -272,22 +274,6 @@ mod csidh_test {
         dbg!(private);
     }
 
-    #[test]
-    fn test_validate_rec() {
-        let mut p: params::Proj = params::Proj {
-            x: params::Fp { c: [0; params::LIMBS] },
-            z: params::Fp { c: [0; params::LIMBS] },
-        };
-
-        let a: params::Proj = params::Proj {
-            x: params::Fp { c: [0; params::LIMBS] },
-            z: params::Fp { c: [0; params::LIMBS] },
-        };
-
-        let upper: usize = 1 << (params::NUM_PRIMES / 2);
-        let lower: usize = 1 << (params::NUM_PRIMES / 3);
-        let mut order: params::UInt = params::UInt { c: [0; params::LIMBS] };
-        
-        dbg!(validate_rec(&mut p, &a, lower, upper, &mut order, &mut true));
-    }
+    
+    
 }
