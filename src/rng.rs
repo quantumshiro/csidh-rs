@@ -1,21 +1,16 @@
-use core::panic;
 use std::fs::File;
-use std::io::{Read, Result};
-use std::sync::Once;
+use std::io::Read;
 
 
-static mut FD: Option<File> = None;
-static INIT: Once = Once::new();
-
-pub fn randombytes(buf: &mut [u8]) -> Result<()> {
-    let mut fd = unsafe { File::open("/dev/urandom").expect("failed to open /dev/urandom") };
-    for i in 0..buf.len() {
-        let n = unsafe { fd.read(&mut buf[i..]).expect("failed to read from /dev/urandom") };
-        if n == 0 {
-            panic!("EOF reached");
-        }
+pub fn randombytes(buf: &mut [u8]) -> std::io::Result<()> {
+    let mut file = match File::open("/dev/urandom") {
+        Ok(f) => f,
+        Err(e) => return Err(e),
+    };
+    match file.read_exact(buf) {
+        Ok(_) => Ok(()),
+        Err(e) => Err(e),
     }
-    Ok(())
 }
 
 #[cfg(test)]
